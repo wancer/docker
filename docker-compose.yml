@@ -1,0 +1,16 @@
+nginx:
+ dockerfile: ./Dockerfile
+ build: ./container/nginx
+ ports:
+  - 8080:80
+ volumes:
+  - ./container/nginx/logs:/etc/logs/nginx
+ volumes_from:
+  - fpm:rw
+ links:
+  - fpm
+fpm:
+ dockerfile: ./Dockerfile
+ build: ./container/php
+ volumes:
+  - ./container/php/www:/var/www:rw
