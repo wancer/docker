@@ -1,29 +1,26 @@
-version: "3.7"
+version: "2"
+
 services:
-  ngnix:
-    build: 
-        context: ./container/nginx
-        dockerfile: ./Dockerfile
-    ports:
-     - "8080:80"
-    volumes:
-      - type: bind
-        source: ./container/nginx/logs
-        target: /var/logs/nginx
-      - type: bind
-        source: ./container/php-fpm/www
-        target: /var/www
+
+  balancer:
+    image: 'dockercloud/haproxy'
     links:
-     - php-fpm
-  php-fpm:
-    build: 
-        context: ./container/php-fpm
-        dockerfile: ./Dockerfile
-    deploy:
-      replicas: 2
+      - web
+    ports:
+      - '127.0.0.1:8080:80'
+      - '127.0.0.1:1936:1936'
     volumes:
-      - type: bind
-        source: ./container/php-fpm/www
-        target: /var/www
-volumes:
-  app_files:
+       - /var/run/docker.sock:/var/run/docker.sock
+
+  web:
+    build: 
+        context: ./container/web
+        dockerfile: ./Dockerfile
+    volumes:
+       - ./container/web/logs:/var/logs/nginx
+       - ./application:/var/www
+
+  session-storage:
+    build:
+        context: ./container/session-storage
+        dockerfile: ./Dockerfile
