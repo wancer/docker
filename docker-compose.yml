@@ -16,6 +16,10 @@ services:
     build: 
         context: ./container/web
         dockerfile: ./Dockerfile
+    links:
+       - database
+       - redis
+       - session-storage
     volumes:
        - ./container/web/logs:/var/logs/nginx
        - ./application:/var/www
@@ -24,3 +28,16 @@ services:
     build:
         context: ./container/session-storage
         dockerfile: ./Dockerfile
+
+  redis:
+    build:
+        context: ./container/redis
+        dockerfile: ./Dockerfile
+
+  database:
+    build:
+        context: ./container/database
+        dockerfile: ./Dockerfile
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+
